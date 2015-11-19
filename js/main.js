@@ -332,11 +332,13 @@ function TextareaExtension(target , processor, font){
     if (target.addEventListener) {
         target.addEventListener("change", this.analyse, false);
         target.addEventListener("keyup", this.analyse, false);
+        target.addEventListener("keydown", this.analyse, false);
         target.addEventListener("scroll", this.scrollSync, false);
         target.addEventListener("mousemove", this.resize, false);
     } else if (target.attachEvent) {
         target.attachEvent("onchange", this.analyse);
         target.attachEvent("onkeyup", this.analyse);
+        target.attachEvent("onkeydown", this.analyse);
         target.attachEvent("onscroll", this.scrollSync);
         target.attachEvent("mousemove", this.resize);
     }
