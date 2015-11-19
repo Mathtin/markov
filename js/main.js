@@ -1,11 +1,6 @@
 $(function(){
     var step_by_step;
-    var a = new TextareaExtension(document.getElementById("rules"), function(rule){
-        if (rule === "") return 0;
-        if ((rule.indexOf("->")<0) || (rule.replace("->", "").indexOf("->")>=0 && rule.indexOf(" ->. ")<0 && rule.indexOf(" -> ")<0))
-            return 1;
-        return 0;
-    });
+    var a = new TextareaExtension(document.getElementById("rules"), preprocessor);
     //Start button
     $('#start').click(function(){
         $("#start").prop("disabled", true);
@@ -154,6 +149,51 @@ function parser(rules){
     }
 }
 
+function preprocessor(rules){
+    rules = rules.map(function(str, i){
+        var map_arr = [];
+        var temp = str.replace(/\/\/.*/g, "");
+        if (temp !== str) map_arr.push({type: "comment", index: str.indexOf("//"), length: rules[i].length - temp.length});
+        if (temp === "") return map_arr;
+        str = temp;
+        if (temp.indexOf(" ->. ")>=0){
+            map_arr.push({type: "production", index: str.indexOf(" ->. "), length: 5});
+            temp = temp.split(" ->. ", 2);
+        }else if (temp.indexOf(" -> ")>=0){
+            map_arr.push({type: "production", index: str.indexOf(" -> "), length: 4});
+            temp = temp.split(" -> ", 2);
+        }else if (temp.indexOf("->.")>=0){
+            if (temp.replace("->.", "").indexOf("->")>=0){
+                map_arr.push({type: "incorrect"});
+                return map_arr;
+            }
+            map_arr.push({type: "production", index: str.indexOf("->."), length: 3});
+            temp = temp.split("->.", 2);
+        }else if (temp.indexOf("->")>=0){
+            if (temp.replace("->", "").indexOf("->")>=0){
+                map_arr.push({type: "incorrect"});
+                return map_arr;
+            }
+            map_arr.push({type: "production", index: str.indexOf("->"), length: 2});
+            temp = temp.split("->", 2);
+        }else {
+            if (temp === "") return map_arr;
+            map_arr.push({type: "incorrect"});
+            return map_arr;
+        }
+        if (temp[0] === temp[1]) {
+            map_arr.push({type: "incorrect"});
+            return map_arr;
+        }
+        if (temp[0] !== "")
+            map_arr.push({type: "left_rule", index: 0, length: temp[0].length});
+        if (temp[1] !== "")
+            map_arr.push({type: "right_rule", index: str.indexOf(temp[1], temp[0].length + 2), length: temp[1].length});
+        return map_arr;
+    });
+    return rules;
+}
+
 function step(rules, text){
     for(var i=0; i<rules.length; i++){
         if (rules[i]["left"] === "" || text.indexOf(rules[i]["left"])>=0){
@@ -214,6 +254,31 @@ function TextareaExtension(target , processor, font){
             if (equals && (text.length - i === line.length || text[line.length + i] === '\n')) return i;
         }
     };
+    
+    var tag_convert = function(map, line) {
+        var result = "";
+        for (var i = 0; i < map.length; i++){
+            if (map[i].type === "incorrect"){
+                result = "<span class='incorrect'>" + line + "</span>";
+                return result;
+            } else for (var k = i + 1; k < map.length; k++){
+                if (map[k].type !== "incorrect" && map[i].index > map[k].index) {
+                    var g = map[i];
+                    map[i] = map[k];
+                    map[k] = g;
+                }
+            }
+        }
+        for (var i in map){
+            if (map[i].type === "comment")
+                result += "<span class='comment'>" + line.substr(map[i].index, map[i].length) + "</span>";
+            else if (map[i].type === "production")
+                result += "<span class='production'>" + line.substr(map[i].index, map[i].length) + "</span>";
+            else if (map[i].type === "left_rule" || map[i].type === "right_rule")
+                result += "<span class='rule_span'>" + line.substr(map[i].index, map[i].length) + "</span>";
+        }
+        return result;
+    };
 
     var setStyleOptions = function(){
         preItem.className = "text-area-selection";
@@ -224,21 +289,27 @@ function TextareaExtension(target , processor, font){
         preItem.style.top = target.offsetTop + "px";
         preItem.style.left = target.offsetLeft + "px";
         target.style.background = "transparent";
+        target.style["-webkit-text-fill-color"] = "transparent";
         target.style.overflow = "auto";
-        preItem.style.margin = "0px 0px";
+        preItem.style.margin = "1px 0px 0px 1px";
     };
     
     this.analyse = function (){
         var text = target.value;
         var rules = text.split(/\n/g);
         var result = "";
-        for (var i in rules) {
-            if (processor(rules[i])) {
+        var rules_map = processor(rules);
+        if (text === "") preItem.style.color = "transparent";
+        else for (var i in rules_map) {
                 var textIndex = findText(text, rules[i]);
-                result += text.substr(0, textIndex) + "<span class='text-color-bordered'>" + rules[i] + "</span>";
+                result += text.substr(0, textIndex) + tag_convert(rules_map[i], rules[i]);
                 text = text.substr(textIndex + rules[i].length, text.length);
+                /*if (processor(rules[i])) {
+                    var textIndex = findText(text, rules[i]);
+                    result += text.substr(0, textIndex) + "<span class='incorrect'>" + rules[i] + "</span>";
+                    text = text.substr(textIndex + rules[i].length, text.length);
+                }*/
             }
-        }
         result += text;
         //result = result.replace(/\n/g, "</br>");
         preItem.innerHTML = result;
