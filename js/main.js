@@ -100,7 +100,7 @@ function parser(rules){
                     success: false,
                     code: "AmbiguousProduction",
                     line: i + 1,
-                    desk: "Неоднозначная продукция"
+                    desc: "Неоднозначная продукция"
                 };
             }
             end = true;
@@ -112,7 +112,7 @@ function parser(rules){
                     success: false,
                     code: "AmbiguousProduction",
                     line: i + 1,
-                    desk: "Неоднозначная продукция"
+                    desc: "Неоднозначная продукция"
                 };
             }
             end = false;
@@ -125,7 +125,7 @@ function parser(rules){
                 success: false,
                 code: "ArrowExpected",
                 line: i + 1,
-                desk: "Ожидалась \"->\""
+                desc: "Ожидалась \"->\""
             };
         }
         str = str.map(function(str){return str.replace(/ /g, "");});
@@ -135,7 +135,7 @@ function parser(rules){
                 success: false,
                 code: "IncorrectRule",
                 line: i + 1,
-                desk: "Некорректное правило"
+                desc: "Некорректное правило"
             };
         }
         //console.log("Parser: \"" + str[0] + "\"" + "->" + "\"" + str[1] + "\"" + " " + end);
@@ -160,13 +160,13 @@ function step(rules, text){
                 success: false,
                 errors: [{
                     code: "BufferOverflow",
-                    desk: "Переполнение буфера"
+                    desc: "Переполнение буфера"
                 }]
             }; else if (!(rules[i].end) && $('#result').val() === $('#set').val())return {
                 success: false,
                 errors: [{
                     code: "Loop",
-                    desk: "Зацикленный алгоритм"
+                    desc: "Зацикленный алгоритм"
                 }]
             };
             return {
@@ -179,7 +179,7 @@ function step(rules, text){
         success: false,
         errors: [{
             code: "NoRules",
-            desk: "Правила не найдены для текущего результата"
+            desc: "Правила не найдены для текущего результата"
         }]
     };
 };
@@ -189,10 +189,10 @@ function ErrorTrap(err){
     for(var i=0; i<err.length; i++){
         if (err[i].code === "NoRules" || err[i].code === "BufferOverflow" || err[i].code === "Loop"){
             error_console += "Error: " + err[i].code + "\n";
-            error_msg += "Ошибка: " + err[i].desk + "\n";
+            error_msg += "Ошибка: " + err[i].desc + "\n";
         } else {
             error_console += "Error: " + err[i].code + " in line " + err[i].line + "\n";
-            error_msg += "Ошибка: " + err[i].desk + " в строке " + err[i].line + "\n";
+            error_msg += "Ошибка: " + err[i].desc + " в строке " + err[i].line + "\n";
         }
     }
     console.log(error_console);
