@@ -304,11 +304,6 @@ function TextareaExtension(target , processor, font){
                 var textIndex = findText(text, rules[i]);
                 result += text.substr(0, textIndex) + tag_convert(rules_map[i], rules[i]);
                 text = text.substr(textIndex + rules[i].length, text.length);
-                /*if (processor(rules[i])) {
-                    var textIndex = findText(text, rules[i]);
-                    result += text.substr(0, textIndex) + "<span class='incorrect'>" + rules[i] + "</span>";
-                    text = text.substr(textIndex + rules[i].length, text.length);
-                }*/
             }
         result += text;
         //result = result.replace(/\n/g, "</br>");
