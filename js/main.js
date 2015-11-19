@@ -259,7 +259,11 @@ function TextareaExtension(target , processor, font){
         var result = "";
         for (var i = 0; i < map.length; i++){
             if (map[i].type === "incorrect"){
-                result = "<span class='incorrect'>" + line + "</span>";
+                var com = -1;
+                for (var c = 0; c < map.length; c++) if (map[c].type === "comment") com = c;
+                if (com >=0) 
+                    result = "<span class='incorrect'>" + line.substr(0, map[com].index) + "</span>" + "<span class='comment'>" + line.substr(map[com].index, map[com].length) + "</span>";
+                else result = "<span class='incorrect'>" + line + "</span>";
                 return result;
             } else for (var k = i + 1; k < map.length; k++){
                 if (map[k].type !== "incorrect" && map[i].index > map[k].index) {

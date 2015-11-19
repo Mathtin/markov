@@ -133,6 +133,19 @@ input:hover{
     overflow:auto;
 }
 
-.text-color-bordered {
+.incorrect {
     border-bottom:1px dotted red;
+    color: red;
+}
+
+.production {
+    color: #A71D5D;
+}
+
+.rule_span {
+    color: #4F98BC;
+}
+
+.comment {
+    color: #969896;
 }
