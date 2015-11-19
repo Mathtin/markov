@@ -1,44 +1,48 @@
-function preprocessor(rules){
-    rules = rules.map(function(str, i){
-        var map_arr = [];
-        var temp = str.replace(/\/\/.*/g, "");
-        if (temp !== str) map_arr.push({type: "comment", index: str.indexOf("//"), length: rules[i].length - temp.length});
+function mapping(str){
+    var map_arr = [];
+    var temp = str.replace(/\/\/.*/g, "");
+    if (temp !== str) map_arr.push({type: "comment", index: str.indexOf("//"), length: str.length - temp.length});
+    if (temp === "") return map_arr;
+    str = temp;
+    if (temp.indexOf(" ->. ")>=0){
+        map_arr.push({type: "production", index: str.indexOf(" ->. "), length: 5});
+        temp = temp.split(" ->. ", 2);
+    }else if (temp.indexOf(" -> ")>=0){
+        map_arr.push({type: "production", index: str.indexOf(" -> "), length: 4});
+        temp = temp.split(" -> ", 2);
+    }else if (temp.indexOf("->.")>=0){
+        if (temp.replace("->.", "").indexOf("->")>=0){
+            map_arr.push({type: "incorrect"});
+            return map_arr;
+        }
+        map_arr.push({type: "production", index: str.indexOf("->."), length: 3});
+        temp = temp.split("->.", 2);
+    }else if (temp.indexOf("->")>=0){
+        if (temp.replace("->", "").indexOf("->")>=0){
+            map_arr.push({type: "incorrect"});
+            return map_arr;
+        }
+        map_arr.push({type: "production", index: str.indexOf("->"), length: 2});
+        temp = temp.split("->", 2);
+    }else {
         if (temp === "") return map_arr;
-        str = temp;
-        if (temp.indexOf(" ->. ")>=0){
-            map_arr.push({type: "production", index: str.indexOf(" ->. "), length: 5});
-            temp = temp.split(" ->. ", 2);
-        }else if (temp.indexOf(" -> ")>=0){
-            map_arr.push({type: "production", index: str.indexOf(" -> "), length: 4});
-            temp = temp.split(" -> ", 2);
-        }else if (temp.indexOf("->.")>=0){
-            if (temp.replace("->.", "").indexOf("->")>=0){
-                map_arr.push({type: "incorrect"});
-                return map_arr;
-            }
-            map_arr.push({type: "production", index: str.indexOf("->."), length: 3});
-            temp = temp.split("->.", 2);
-        }else if (temp.indexOf("->")>=0){
-            if (temp.replace("->", "").indexOf("->")>=0){
-                map_arr.push({type: "incorrect"});
-                return map_arr;
-            }
-            map_arr.push({type: "production", index: str.indexOf("->"), length: 2});
-            temp = temp.split("->", 2);
-        }else {
-            if (temp === "") return map_arr;
-            map_arr.push({type: "incorrect"});
-            return map_arr;
-        }
-        if (temp[0] === temp[1]) {
-            map_arr.push({type: "incorrect"});
-            return map_arr;
-        }
-        if (temp[0] !== "")
-            map_arr.push({type: "left_rule", index: 0, length: temp[0].length});
-        if (temp[1] !== "")
-            map_arr.push({type: "right_rule", index: str.indexOf(temp[1], temp[0].length + 2), length: temp[1].length});
+        map_arr.push({type: "incorrect"});
         return map_arr;
+    }
+    if (temp[0] === temp[1]) {
+        map_arr.push({type: "incorrect"});
+        return map_arr;
+    }
+    if (temp[0] !== "")
+        map_arr.push({type: "left_rule", index: 0, length: temp[0].length});
+    if (temp[1] !== "")
+        map_arr.push({type: "right_rule", index: str.indexOf(temp[1], temp[0].length + 2), length: temp[1].length});
+    return map_arr;
+}
+
+function preprocessor(rules){
+    rules = rules.map(function(str){
+        return mapping(str);
     });
     return rules;
 }
@@ -92,39 +96,46 @@ function TextareaExtension(target , processor, font){
         preItem.style.top = target.offsetTop + "px";
         preItem.style.left = target.offsetLeft + "px";
         target.style.background = "transparent";
-        target.style["-webkit-text-fill-color"] = "transparent";
+        target.style["-webkit-text-fill-color"] = "#000";
         target.style.overflow = "auto";
         preItem.style.margin = "1px 0px 0px 1px";
     };
     
-    var called = false;
+    var changed = false;
+    var timer = setTimeout(analyse, 900);
     
-    var anta = function(){
-        target.style["-webkit-text-fill-color"] = "transparent";
-        target.style.background = "transparent";
-        var text = target.value;
-        var rules = text.split(/\n/g);
-        var result = "";
-        var rules_map = processor(rules);
-        if (text === "") preItem.style.color = "transparent";
-        else for (var i in rules_map) {
-            var textIndex = findText(text, rules[i]);
-            result += text.substr(0, textIndex) + tag_convert(rules_map[i], rules[i]);
-            text = text.substr(textIndex + rules[i].length, text.length);
+    function analyse(){
+        if(changed){
+            target.style["-webkit-text-fill-color"] = "transparent";
+            target.style.background = "transparent";
+            var text = target.value;
+            var rules = text.split(/\n/g);
+            var result = "";
+            var rules_map = processor(rules);
+            if (text === "") preItem.style.color = "transparent";
+            else for (var i in rules_map) {
+                var textIndex = findText(text, rules[i]);
+                result += text.substr(0, textIndex) + tag_convert(rules_map[i], rules[i]);
+                text = text.substr(textIndex + rules[i].length, text.length);
+            }
+            result += text;
+            //result = result.replace(/\n/g, "</br>");
+            preItem.innerHTML = result;
+            changed = false;
         }
-        result += text;
-        //result = result.replace(/\n/g, "</br>");
-        preItem.innerHTML = result;
     };
     
-    this.analyse = function (){
-        if (!called){
-            target.style["-webkit-text-fill-color"] = "#000";
-            target.style.background = "#fff";
-            called = true;
-            $.debounce(800, anta)();
-            called = false;
+    this.dark = function (){
+        if(changed) {
+            clearTimeout(timer);
+            timer = setTimeout(analyse, 700);
         }
+        else {
+            changed = true;
+            timer = setTimeout(analyse, 700);
+        }
+        target.style["-webkit-text-fill-color"] = "#000";
+        target.style.background = "#fff";
     };
 
     this.scrollSync = function () {
@@ -137,21 +148,21 @@ function TextareaExtension(target , processor, font){
         preItem.style.top = target.offsetTop  + "px";
         preItem.style.left = target.offsetLeft + "px";
     };
-
+    
     var preItem = document.createElement("pre");
    
     setStyleOptions();
 
     if (target.addEventListener) {
-        target.addEventListener("change", this.analyse, false);
-        target.addEventListener("keyup", this.analyse, false);
-        target.addEventListener("keydown", this.analyse, false);
+        target.addEventListener("change", analyse, false);
+        target.addEventListener("keyup", this.dark, false);
+        target.addEventListener("keydown", this.dark, false);
         target.addEventListener("scroll", this.scrollSync, false);
         target.addEventListener("mousemove", this.resize, false);
     } else if (target.attachEvent) {
-        target.attachEvent("onchange", this.analyse);
-        target.attachEvent("onkeyup", this.analyse);
-        target.attachEvent("onkeydown", this.analyse);
+        target.attachEvent("onchange", analyse);
+        target.attachEvent("onkeyup", this.dark);
+        target.attachEvent("onkeydown", this.dark);
         target.attachEvent("onscroll", this.scrollSync);
         target.attachEvent("mousemove", this.resize);
     }
