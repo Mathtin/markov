@@ -1,0 +1,138 @@
+h1 {
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 24pt;
+    margin-top: 3px;
+    text-align: center;
+}
+
+textarea {
+    resize: none;
+}
+
+#content{
+    width: 80%;
+    margin: 0 auto 5px;
+    text-align: center;
+    border: 1px solid #656565;
+}
+
+#content textarea{
+    margin-bottom: 10px;
+    width: 94%;
+}
+
+#content input{
+    margin-bottom: 10px;
+    width: 92%;
+}
+
+#content p{
+    margin-bottom: 5px;
+}
+
+.left {
+    float: left;
+    width: 50%;
+}
+
+.right {
+    float: right;
+    width: 50%;
+}
+
+#rulse_up p{
+    float: left;
+}
+
+.middle_buttons{
+    margin-right: 1%;
+    float: right;
+}
+
+#top_content{
+    height: 80px;
+}
+
+input {
+    border: 2px solid rgba(200,200,200,1);
+    color: #5B7FA6;
+    font-size: 14px;
+    box-shadow: 1px 1px 3px 1px rgba(210,210,210, 0.2) inset;
+    padding-left: 5px;
+    -webkit-transition: all 300ms cubic-bezier(0.42, 0, 0.58, 1);
+    transition: all 200ms cubic-bezier(0.42, 0, 0.58, 1);
+}
+input::-webkit-input-placeholder {color:#DCDCDC; opacity: 1; transition: opacity 0.3s ease;}
+input:focus::-webkit-input-placeholder {opacity: 0; transition: opacity 0.3s ease;}
+input:hover{
+    border: 2px solid rgba(52, 152, 219, 1);
+    box-shadow: 1px 1px 3px 1px rgba(52, 152, 219, 0.2) inset;
+    -webkit-transition: all 200ms cubic-bezier(0.42, 0, 0.58, 1);
+    -moz-transition: all 200ms cubic-bezier(0.42, 0, 0.58, 1);
+    -o-transition: all 200ms cubic-bezier(0.42, 0, 0.58, 1);
+    transition: all 200ms cubic-bezier(0.42, 0, 0.58, 1);
+}
+
+#rulse_up{
+    height: 34px;
+}
+
+#middle_content{
+    height: 450px;
+}
+
+.middle_blocks{
+    width: 50%;
+    float: left;
+    text-align: left;
+}
+.middle_blocks p{
+    float: left;
+    padding-left: 6px;
+    height: 15px;
+    margin: 0 0 0 0;
+}
+.middle_blocks textarea{
+    height: 400px;
+    margin-left: 2%;
+}
+
+#rules_p{
+    margin-left: 1%;
+}
+
+#state{
+    height: 60px;
+    margin-left: 1%;
+}
+
+#history{
+    height: 300px;
+    margin-left: 1%;
+}
+
+#history span{
+    width: 33%;
+    float: left;
+}
+.history_note{
+    width: 94%;
+    /*text-align: center;*/
+    float: left;
+}
+
+.text-area-selection {
+    position:absolute;  
+    padding:2px; 
+    z-index:-1;
+    display:block;
+    word-wrap:break-word;  
+    white-space:pre-wrap;
+    color:white;
+    overflow:auto;
+}
+
+.text-color-bordered {
+    border-bottom:1px dotted red;
+}
