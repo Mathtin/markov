@@ -226,7 +226,7 @@ function TextareaExtension(target , processor, font){
         target.style.background = "transparent";
         target.style.overflow = "auto";
         preItem.style.margin = "0px 0px";
-    }
+    };
     
     this.analyse = function (){
         var text = target.value;
