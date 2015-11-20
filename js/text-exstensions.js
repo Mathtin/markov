@@ -148,8 +148,6 @@ function TextareaExtension(target , processor){
     };
 
     this.resize = function () {
-        preItem.style.width = target.style.width;
-        preItem.style.height = target.style.height;
         preItem.style.top = target.offsetTop  + "px";
         preItem.style.left = target.offsetLeft + "px";
     };
