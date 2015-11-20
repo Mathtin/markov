@@ -74,6 +74,23 @@ input:hover{
     transition: all 200ms cubic-bezier(0.42, 0, 0.58, 1);
 }
 
+textarea{
+    border: 2px solid rgba(200,200,200,1);
+    font-size: 14px;
+    font-family: Arial;
+    box-shadow: 1px 1px 3px 1px rgba(210,210,210, 0.2) inset;
+    padding-left: 5px;
+}
+
+textarea:hover {
+    border: 2px solid rgba(52, 152, 219, 1);
+    box-shadow: 1px 1px 3px 1px rgba(52, 152, 219, 0.2) inset;
+    -webkit-transition: all 200ms cubic-bezier(0.42, 0, 0.58, 1);
+    -moz-transition: all 200ms cubic-bezier(0.42, 0, 0.58, 1);
+    -o-transition: all 200ms cubic-bezier(0.42, 0, 0.58, 1);
+    transition: all 200ms cubic-bezier(0.42, 0, 0.58, 1);
+}
+
 #rulse_up{
     height: 34px;
 }
@@ -124,13 +141,17 @@ input:hover{
 
 .text-area-selection {
     position:absolute;  
-    padding:2px; 
+    padding:3px; 
     z-index:-1;
     display:block;
     word-wrap:break-word;  
     white-space:pre-wrap;
     color:white;
     overflow:auto;
+    width: 94%;
+    height: 400px;
+    font: 14px Arial;
+    margin: 1px 0px 0px 4px;
 }
 
 .incorrect {
@@ -148,4 +169,8 @@ input:hover{
 
 .comment {
     color: #969896;
+}
+
+.none {
+    color: #000;
 }

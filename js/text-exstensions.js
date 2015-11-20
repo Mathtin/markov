@@ -1,8 +1,15 @@
 function mapping(str){
     var map_arr = [];
+    if (str === ""){
+        map_arr.push({type: "none", index: 0, length: 0});
+        return map_arr;
+    }
     var temp = str.replace(/\/\/.*/g, "");
     if (temp !== str) map_arr.push({type: "comment", index: str.indexOf("//"), length: str.length - temp.length});
-    if (temp === "") return map_arr;
+    if (temp.replace(/ /g, "") === ""){
+        map_arr.push({type: "none", index: 0, length: temp.length});
+        return map_arr;
+    }
     str = temp;
     if (temp.indexOf(" ->. ")>=0){
         map_arr.push({type: "production", index: str.indexOf(" ->. "), length: 5});
@@ -25,11 +32,10 @@ function mapping(str){
         map_arr.push({type: "production", index: str.indexOf("->"), length: 2});
         temp = temp.split("->", 2);
     }else {
-        if (temp === "") return map_arr;
         map_arr.push({type: "incorrect"});
         return map_arr;
     }
-    if (temp[0] === temp[1]) {
+    if (temp[0].replace(/ /g, "") === temp[1].replace(/ /g, "")) {
         map_arr.push({type: "incorrect"});
         return map_arr;
     }
@@ -47,7 +53,7 @@ function preprocessor(rules){
     return rules;
 }
 
-function TextareaExtension(target , processor, font){
+function TextareaExtension(target , processor){
     var findText = function (text, line) {
         for (var i = 0 ; i < text.length - line.length +1; i++) {
             var equals = true;
@@ -83,6 +89,8 @@ function TextareaExtension(target , processor, font){
                 result += "<span class='production'>" + line.substr(map[i].index, map[i].length) + "</span>";
             else if (map[i].type === "left_rule" || map[i].type === "right_rule")
                 result += "<span class='rule_span'>" + line.substr(map[i].index, map[i].length) + "</span>";
+            else if (map[i].type === "none")
+                result += "<span class='none'>" + (map[i].length==0?"empty":line.substr(map[i].index, map[i].length)) + "</span>";
         }
         return result;
     };
@@ -90,15 +98,10 @@ function TextareaExtension(target , processor, font){
     var setStyleOptions = function(){
         preItem.className = "text-area-selection";
         target.parentNode.appendChild(preItem);
-        target.style.font = preItem.style.font = font || "14px Arial";
-        preItem.style.width = target.style.width;
-        preItem.style.height = target.style.height;
         preItem.style.top = target.offsetTop + "px";
         preItem.style.left = target.offsetLeft + "px";
         target.style.background = "transparent";
         target.style["-webkit-text-fill-color"] = "#000";
-        target.style.overflow = "auto";
-        preItem.style.margin = "1px 0px 0px 1px";
     };
     
     var changed = false;
@@ -128,11 +131,11 @@ function TextareaExtension(target , processor, font){
     this.dark = function (){
         if(changed) {
             clearTimeout(timer);
-            timer = setTimeout(analyse, 700);
+            timer = setTimeout(analyse, 300);
         }
         else {
             changed = true;
-            timer = setTimeout(analyse, 700);
+            timer = setTimeout(analyse, 300);
         }
         target.style["-webkit-text-fill-color"] = "#000";
         target.style.background = "#fff";
@@ -154,13 +157,13 @@ function TextareaExtension(target , processor, font){
     setStyleOptions();
 
     if (target.addEventListener) {
-        target.addEventListener("change", analyse, false);
+        target.addEventListener("change", this.dark, false);
         target.addEventListener("keyup", this.dark, false);
         target.addEventListener("keydown", this.dark, false);
         target.addEventListener("scroll", this.scrollSync, false);
         target.addEventListener("mousemove", this.resize, false);
     } else if (target.attachEvent) {
-        target.attachEvent("onchange", analyse);
+        target.attachEvent("onchange", this.dark);
         target.attachEvent("onkeyup", this.dark);
         target.attachEvent("onkeydown", this.dark);
         target.attachEvent("onscroll", this.scrollSync);

@@ -1,6 +1,8 @@
 $(function(){
     var step_by_step;
     var a = new TextareaExtension(document.getElementById("rules"), preprocessor);
+    var span_index = []
+    var iteration = 0;
     //Start button
     $('#start').click(function(){
         $("#start").prop("disabled", true);
@@ -14,11 +16,12 @@ $(function(){
             if (!rules_stack.success) throw rules_stack.errors;
             var pipe = {
                 func: function(){
-                        var end_check = step(this.rules, $('#result').val());
+                        this.iteration++;
+                        var end_check = step(this.rules, $('#result').val(), this.iteration);
                         this.end = end_check.end;
                         if (!end_check.success || end_check.end){
                             if (!end_check.success) ErrorTrap(end_check.errors);
-                            else $('#state').val("Успешное завершение алгоритма!");
+                            else $('#state').val("РЈСЃРїРµС€РЅРѕРµ Р·Р°РІРµСЂС€РµРЅРёРµ Р°Р»РіРѕСЂРёС‚РјР°!");
                             $("#start").prop("disabled", false);
                             $("#step").prop("disabled", false);
                             $("#speed").prop("disabled", false);
@@ -26,7 +29,8 @@ $(function(){
                         }
                     },
                 rules: rules_stack.result,
-                end: false
+                end: false,
+                iteration: iteration
             };
             step_by_step = setInterval(function() { pipe.func.call(pipe); }, parseInt($("#speed").val()));
         } catch (err){
@@ -45,13 +49,14 @@ $(function(){
             if (!rules_stack.success) throw rules_stack.errors;
             rules_stack = parser(rules_stack.result);
             if (!rules_stack.success) throw rules_stack.errors;
-            rules_stack = step(rules_stack.result, $('#result').val());
+            iteration++;
+            rules_stack = step(rules_stack.result, $('#result').val(),iteration);
             if (!rules_stack.success) throw rules_stack.errors;
         } catch (err){
             ErrorTrap(err);
             return 0;
         }
-        if(rules_stack.end) $('#state').val("Успешное завершение алгоритма!");
+        if(rules_stack.end) $('#state').val("РЈСЃРїРµС€РЅРѕРµ Р·Р°РІРµСЂС€РµРЅРёРµ Р°Р»РіРѕСЂРёС‚РјР°!");
         return 0;
     });
     
@@ -69,6 +74,7 @@ $(function(){
         clearInterval(step_by_step);
         $('#result').val($('#set').val());
         $('#history').val("");
+        iteration = 0;
     });
     
     $('#set').keyup(function(){
@@ -100,7 +106,7 @@ function parser(rules){
                     success: false,
                     code: "AmbiguousProduction",
                     line: i + 1,
-                    desc: "Неоднозначная продукция"
+                    desc: "РќРµРѕРґРЅРѕР·РЅР°С‡РЅР°СЏ РїСЂРѕРґСѓРєС†РёСЏ"
                 };
             }
             end = true;
@@ -112,7 +118,7 @@ function parser(rules){
                     success: false,
                     code: "AmbiguousProduction",
                     line: i + 1,
-                    desc: "Неоднозначная продукция"
+                    desc: "РќРµРѕРґРЅРѕР·РЅР°С‡РЅР°СЏ РїСЂРѕРґСѓРєС†РёСЏ"
                 };
             }
             end = false;
@@ -125,7 +131,7 @@ function parser(rules){
                 success: false,
                 code: "ArrowExpected",
                 line: i + 1,
-                desc: "Ожидалась \"->\""
+                desc: "РћР¶РёРґР°Р»РѕСЃСЊ \"->\""
             };
         }
         str = str.map(function(str){return str.replace(/ /g, "");});
@@ -135,7 +141,7 @@ function parser(rules){
                 success: false,
                 code: "IncorrectRule",
                 line: i + 1,
-                desc: "Некорректное правило"
+                desc: "РќРµРєРѕСЂСЂРµРєС‚РЅРѕРµ РїСЂР°РІРёР»Рѕ"
             };
         }
         //console.log("Parser: \"" + str[0] + "\"" + "->" + "\"" + str[1] + "\"" + " " + end);
@@ -149,24 +155,28 @@ function parser(rules){
     }
 }
 
-function step(rules, text){
+function step(rules, text, iteration){
     for(var i=0; i<rules.length; i++){
         if (rules[i].left === "" || text.indexOf(rules[i].left)>=0){
             if (rules[i].left === "") text = rules[i].right + text;
             else text = text.replace(rules[i].left, rules[i].right);
             $('#result').val(text);
-            $('#history').val($('#history').val() + text + "\n");
+            $('#history').append("<div class=\"history_note\">"+ 
+                    "<span class=\"hist_id\"> " + iteration + ". </span>" +
+                    "<span class=\"hist_rule\">" + (rules[i].left + rules[i].end ? " ->. " : " -> ") + rules[i].right + "</span>" +
+                    "<span class=\"hist_result\">" + text + "</span>" +
+                    "</div>");
             if ($('#result').val().length>256) return {
                 success: false,
                 errors: [{
                     code: "BufferOverflow",
-                    desc: "Переполнение буфера"
+                    desc: "РџРµСЂРµРїРѕР»РЅРµРЅРёРµ Р±СѓС„РµСЂР°"
                 }]
             }; else if (!(rules[i].end) && $('#result').val() === $('#set').val())return {
                 success: false,
                 errors: [{
                     code: "Loop",
-                    desc: "Зацикленный алгоритм"
+                    desc: "Р—Р°С†РёРєР»РµРЅРЅС‹Р№ Р°Р»РіРѕСЂРёС‚Рј"
                 }]
             };
             return {
@@ -179,7 +189,7 @@ function step(rules, text){
         success: false,
         errors: [{
             code: "NoRules",
-            desc: "Правила не найдены для текущего результата"
+            desc: "РџСЂР°РІРёР»Р° РЅРµ РЅР°Р№РґРµРЅС‹ РґР»СЏ С‚РµРєСѓС‰РµРіРѕ СЂРµР·СѓР»СЊС‚Р°С‚Р°"
         }]
     };
 };
@@ -189,10 +199,10 @@ function ErrorTrap(err){
     for(var i=0; i<err.length; i++){
         if (err[i].code === "NoRules" || err[i].code === "BufferOverflow" || err[i].code === "Loop"){
             error_console += "Error: " + err[i].code + "\n";
-            error_msg += "Ошибка: " + err[i].desc + "\n";
+            error_msg += "РћС€РёР±РєР°: " + err[i].desc + "\n";
         } else {
             error_console += "Error: " + err[i].code + " in line " + err[i].line + "\n";
-            error_msg += "Ошибка: " + err[i].desc + " в строке " + err[i].line + "\n";
+            error_msg += "РћС€РёР±РєР°: " + err[i].desc + " РІ СЃС‚СЂРѕРєРµ " + err[i].line + "\n";
         }
     }
     console.log(error_console);
