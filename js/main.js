@@ -1,7 +1,6 @@
 $(function(){
     var step_by_step;
     var a = new TextareaExtension(document.getElementById("rules"), preprocessor);
-    var span_index = []
     var iteration = 0;
     //Start button
     $('#start').click(function(){
@@ -9,7 +8,7 @@ $(function(){
         $("#step").prop("disabled", true);
         $("#speed").prop("disabled", true);
         $('#history').empty();
-        $('#history').append("<div class=\"history_note\" id=\"top_history\"><span class=\"hist_id\">N</span><span class=\"hist_rule\">Правило</span><span class=\"hist_result\">Результат</span></div>")
+        $('#history').append("<div class=\"history_note\" id=\"top_history\"><span class=\"hist_id\">N</span><span class=\"hist_rule\">Правило</span><span class=\"hist_result\">Результат</span></div>");
         try {
             var rules_stack = preprocess($('#rules').val());
             if (!rules_stack.success) throw rules_stack.errors;
@@ -75,7 +74,7 @@ $(function(){
         clearInterval(step_by_step);
         $('#result').val($('#set').val());
         $('#history').empty();
-        $('#history').append("<div class=\"history_note\" id=\"top_history\"><span class=\"hist_id\">N</span><span class=\"hist_rule\">Правило</span><span class=\"hist_result\">Результат</span></div>")
+        $('#history').append("<div class=\"history_note\" id=\"top_history\"><span class=\"hist_id\">N</span><span class=\"hist_rule\">Правило</span><span class=\"hist_result\">Результат</span></div>");
         iteration = 0;
     });
     
