@@ -6,7 +6,7 @@ function mapping(str){
     }
     var temp = str.replace(/\/\/.*/g, "");
     if (temp !== str) map_arr.push({type: "comment", index: str.indexOf("//"), length: str.length - temp.length});
-    if (temp.replace(/ /g, "") === ""){
+    if (temp.replace(/ /g, "") === "" && temp !== ""){
         map_arr.push({type: "none", index: 0, length: temp.length});
         return map_arr;
     }
@@ -90,7 +90,7 @@ function TextareaExtension(target , processor){
             else if (map[i].type === "left_rule" || map[i].type === "right_rule")
                 result += "<span class='rule_span'>" + line.substr(map[i].index, map[i].length) + "</span>";
             else if (map[i].type === "none")
-                result += "<span class='none'>" + (map[i].length==0?"empty":line.substr(map[i].index, map[i].length)) + "</span>";
+                result += "<span class='none'>" + (map[i].length===0?"":line.substr(map[i].index, map[i].length)) + "</span>";
         }
         return result;
     };
@@ -122,9 +122,11 @@ function TextareaExtension(target , processor){
                 text = text.substr(textIndex + rules[i].length, text.length);
             }
             result += text;
+            if (rules[rules.length - 1] === "") result += "<br>";
             //result = result.replace(/\n/g, "</br>");
             preItem.innerHTML = result;
             changed = false;
+            preItem.scrollTop = target.scrollTop;
         }
     };
     

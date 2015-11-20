@@ -8,7 +8,8 @@ $(function(){
         $("#start").prop("disabled", true);
         $("#step").prop("disabled", true);
         $("#speed").prop("disabled", true);
-        $('#history').val("");
+        $('#history').empty();
+        $('#history').append("<div class=\"history_note\" id=\"top_history\"><span class=\"hist_id\">N</span><span class=\"hist_rule\">Правило</span><span class=\"hist_result\">Результат</span></div>")
         try {
             var rules_stack = preprocess($('#rules').val());
             if (!rules_stack.success) throw rules_stack.errors;
@@ -73,12 +74,13 @@ $(function(){
         $("#speed").prop("disabled", false);
         clearInterval(step_by_step);
         $('#result').val($('#set').val());
-        $('#history').val("");
+        $('#history').empty();
+        $('#history').append("<div class=\"history_note\" id=\"top_history\"><span class=\"hist_id\">N</span><span class=\"hist_rule\">Правило</span><span class=\"hist_result\">Результат</span></div>")
         iteration = 0;
     });
     
     $('#set').keyup(function(){
-        if ($('#history').val() === "") $('#result').val($('#set').val());
+        $('#result').val($('#set').val());
     });
 });
 
@@ -163,7 +165,7 @@ function step(rules, text, iteration){
             $('#result').val(text);
             $('#history').append("<div class=\"history_note\">"+ 
                     "<span class=\"hist_id\"> " + iteration + ". </span>" +
-                    "<span class=\"hist_rule\">" + (rules[i].left + rules[i].end ? " ->. " : " -> ") + rules[i].right + "</span>" +
+                    "<span class=\"hist_rule\">" + rules[i].left + (rules[i].end ? " ->. " : " -> ") + rules[i].right + "</span>" +
                     "<span class=\"hist_result\">" + text + "</span>" +
                     "</div>");
             if ($('#result').val().length>256) return {
