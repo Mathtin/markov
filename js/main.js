@@ -1,6 +1,7 @@
 $(function(){
     var step_by_step;
-    var tags = {    //CSS class map
+    var clicked = false;
+    var classes = {    //CSS class map
         space: "none",
         comment: "comment",
         production: "production",
@@ -12,14 +13,19 @@ $(function(){
     var a = new TextareaExtension(document.getElementById("rules"), function(rules){
         rules = rules.map(function(str){ return mapping(str); });
         return rules;
-    }, tags);
+    }, classes);
+    window.onresize = function(event) {
+        a.resize();
+        a.scrollSync();
+    };
     var iteration = 0;
     //Start button
     $('#start').click(function(){
         buttons_active(false);
-        if ($('#set').val() === $('#result').val()){
+        if ($('#set').val() === $('#result').val() || clicked){
             $('#history').empty();
-            $('#history').append("<div class=\"history_note\" id=\"top_history\"><span class=\"hist_id\">N</span><span class=\"hist_rule\">Правило</span><span class=\"hist_result\">Результат</span></div>");
+            $('#history').append("<div class=\"history_note\" id=\"top_history\"><span class=\"hist_idf\">N</span><span class=\"hist_rulef\">Правило</span><span class=\"hist_resultf\">Результат</span></div>");
+            clicked = false;
         }
         try {
             var rules_stack = parser($('#rules').val());
@@ -74,14 +80,74 @@ $(function(){
         clearInterval(step_by_step);
         $('#result').val($('#set').val());
         $('#history').empty();
-        $('#history').append("<div class=\"history_note\" id=\"top_history\"><span class=\"hist_id\">N</span><span class=\"hist_rule\">Правило</span><span class=\"hist_result\">Результат</span></div>");
+        $('#history').append("<div class=\"history_note\" id=\"top_history\"><span class=\"hist_idf\">N</span><span class=\"hist_rulef\">Правило</span><span class=\"hist_resultf\">Результат</span></div>");
         iteration = 0;
     });
     
     $('#set').keyup(function(){
         $('#result').val($('#set').val());
     });
+    
+    $('body').on('click','.hist_result', function () {
+        $('#result').val($(this).data("strresult"));
+        clicked = true;
+    });
+    
+    $('body').on('click','.hist_rule', function () {
+        var ctrl = document.getElementById("rules");
+        console.log($(this).data("ruleline"));
+        var pos = indexOfRule($(this).data("ruleline"));
+        if(ctrl.setSelectionRange) {
+            ctrl.focus();
+            ctrl.setSelectionRange(pos,pos);
+        }
+        else if (ctrl.createTextRange) {
+            var range = ctrl.createTextRange();
+            range.collapse(true);
+            range.moveEnd('character', pos);
+            range.moveStart('character', pos);
+            range.select();
+            ctrl.focus();
+            ctrl.setSelectionRange(pos,pos);
+        }
+    });
+
+    /*Check LocalStorage*/
+    if (('localStorage' in window) && window.localStorage !== null){
+        var markov_in_ls = "markovbymathtinandplaguedo";
+        var saved = localStorage.getItem(markov_in_ls);
+        if(saved===null || saved === "[object Object]"){
+            saved = JSON.stringify({set: "", result: "", rules: "", state: "" });
+            localStorage.setItem(markov_in_ls, saved);
+        }
+        var saved_complex = JSON.parse(saved);
+        $('#set').val(saved_complex.set);
+        $('#rules').val(saved_complex.rules);
+        $('#result').val($('#set').val());
+        $('#set').keyup(update_cache());
+        $('#rules').keyup(update_cache());
+        a.dark();
+    }
 });
+
+function update_cache(){
+    var cache = {
+        set: $('#set').val(),
+        rules: $('#rules').val()
+    };
+    localStorage.setItem("markovbymathtinandplaguedo", JSON.stringify(cache));
+}
+
+function indexOfRule(line_num){
+    if (line_num === 1) return 0;
+    var text = $('#rules').val();
+    var arr = text.split("\n");
+    var index = arr[0].length + 1;
+    for(var k = 1; k < arr.length; k++){
+        index += arr[k].length + 1;
+        if (k + 1 === line_num) return index - 1;
+    }
+}
 
 function buttons_active(on){
     $("#start").prop("disabled", !on);
@@ -97,8 +163,8 @@ function step(rules, text, iteration){
             $('#result').val(text);
             $('#history').append("<div class=\"history_note\">"+ 
                     "<span class=\"hist_id\"> " + iteration + ". </span>" +
-                    "<span class=\"hist_rule\">" + rules[i].left + (rules[i].end ? " ->. " : " -> ") + rules[i].right + "</span>" +
-                    "<span class=\"hist_result\">" + text + "</span>" +
+                    "<span class=\"hist_rule\" data-ruleline = \"" + rules[i].line + "\">" + rules[i].left + (rules[i].end ? " ->. " : " -> ") + rules[i].right + "</span>" +
+                    "<span class=\"hist_result\" data-strresult = \"" + text + "\">" + text + "</span>" +
                     "</div>");
             if ($('#result').val().length>256) return {
                 success: false,

@@ -11,7 +11,7 @@ textarea {
 }
 
 #content{
-    width: 80%;
+    width: 800px;
     margin: 0 auto 5px;
     text-align: center;
     border: 1px solid #656565;
@@ -142,17 +142,40 @@ textarea:hover {
     float: left;
 }
 .history_note:hover{
-    background-color: yellow;
+    background-color: #dddddd;
     cursor: pointer;
 }
+
+/* MEGA CRUTCH */
+.hist_idf{
+    width: 6%;
+}
+.hist_rulef{
+    width: 22.5%;
+}
+.hist_resultf{
+    width: 69.5%;
+}
+/**/
+
 .hist_id{
-    width: 7%;
+    width: 6%;
 }
 .hist_rule{
-    width: 23%;
+    width: 22.5%;
 }
 .hist_result{
-    width: 70%;
+    width: 69.5%;
+}
+/* Наведение */
+.hist_id:hover{
+    /*border: 1px solid black;*/
+}
+.hist_rule:hover{
+    border: 1px solid black;
+}
+.hist_result:hover{
+    border: 1px solid black;
 }
 
 .text-area-selection {
@@ -165,7 +188,7 @@ textarea:hover {
     white-space:pre-wrap;
     color:white;
     overflow:auto;
-    width: 94%;
+    width: 380px;
     height: 400px;
     font: 14px Arial;
     margin: 1px 0px 0px 4px;

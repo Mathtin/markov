@@ -1,4 +1,4 @@
-function TextareaExtension(target , processor, tags){
+function TextareaExtension(target , processor, classes){
     //Regular find line function
     var findLine = function (text, line) {
         for (var i = 0 ; i < text.length - line.length +1; i++) {
@@ -22,7 +22,7 @@ function TextareaExtension(target , processor, tags){
                 }
         //Inserting span tags
         for (var i in map)
-            result += "<span class='" + tags[map[i].type] + "'>" + (map[i].length===0?"":line.substr(map[i].index, map[i].length)) + "</span>";
+            result += "<span class='" + classes[map[i].type] + "'>" + (map[i].length===0?"":line.substr(map[i].index, map[i].length)) + "</span>";
         return result;
     };
     //Regular function of setting style options
