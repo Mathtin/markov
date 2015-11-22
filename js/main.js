@@ -95,7 +95,6 @@ $(function(){
     
     $('body').on('click','.hist_rule', function () {
         var ctrl = document.getElementById("rules");
-        console.log($(this).data("ruleline"));
         var pos = indexOfRule($(this).data("ruleline"));
         if(ctrl.setSelectionRange) {
             ctrl.focus();
