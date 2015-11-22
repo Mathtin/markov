@@ -1,60 +1,6 @@
-function mapping(str){
-    var map_arr = [];
-    if (str === ""){
-        map_arr.push({type: "none", index: 0, length: 0});
-        return map_arr;
-    }
-    var temp = str.replace(/\/\/.*/g, "");
-    if (temp !== str) map_arr.push({type: "comment", index: str.indexOf("//"), length: str.length - temp.length});
-    if (temp.replace(/ /g, "") === "" && temp !== ""){
-        map_arr.push({type: "none", index: 0, length: temp.length});
-        return map_arr;
-    }
-    str = temp;
-    if (temp.indexOf(" ->. ")>=0){
-        map_arr.push({type: "production", index: str.indexOf(" ->. "), length: 5});
-        temp = temp.split(" ->. ", 2);
-    }else if (temp.indexOf(" -> ")>=0){
-        map_arr.push({type: "production", index: str.indexOf(" -> "), length: 4});
-        temp = temp.split(" -> ", 2);
-    }else if (temp.indexOf("->.")>=0){
-        if (temp.replace("->.", "").indexOf("->")>=0){
-            map_arr.push({type: "incorrect"});
-            return map_arr;
-        }
-        map_arr.push({type: "production", index: str.indexOf("->."), length: 3});
-        temp = temp.split("->.", 2);
-    }else if (temp.indexOf("->")>=0){
-        if (temp.replace("->", "").indexOf("->")>=0){
-            map_arr.push({type: "incorrect"});
-            return map_arr;
-        }
-        map_arr.push({type: "production", index: str.indexOf("->"), length: 2});
-        temp = temp.split("->", 2);
-    }else {
-        map_arr.push({type: "incorrect"});
-        return map_arr;
-    }
-    if (temp[0].replace(/ /g, "") === temp[1].replace(/ /g, "")) {
-        map_arr.push({type: "incorrect"});
-        return map_arr;
-    }
-    if (temp[0] !== "")
-        map_arr.push({type: "left_rule", index: 0, length: temp[0].length});
-    if (temp[1] !== "")
-        map_arr.push({type: "right_rule", index: str.indexOf(temp[1], temp[0].length + 2), length: temp[1].length});
-    return map_arr;
-}
-
-function preprocessor(rules){
-    rules = rules.map(function(str){
-        return mapping(str);
-    });
-    return rules;
-}
-
-function TextareaExtension(target , processor){
-    var findText = function (text, line) {
+function TextareaExtension(target , processor, tags){
+    //Regular find line function
+    var findLine = function (text, line) {
         for (var i = 0 ; i < text.length - line.length +1; i++) {
             var equals = true;
             for (var j = 0; j < line.length && equals; j++) {
@@ -63,38 +9,23 @@ function TextareaExtension(target , processor){
             if (equals && (text.length - i === line.length || text[line.length + i] === '\n')) return i;
         }
     };
-    
+    //Regular tag convertion (inserting span tags in text)
     var tag_convert = function(map, line) {
         var result = "";
-        for (var i = 0; i < map.length; i++){
-            if (map[i].type === "incorrect"){
-                var com = -1;
-                for (var c = 0; c < map.length; c++) if (map[c].type === "comment") com = c;
-                if (com >=0) 
-                    result = "<span class='incorrect'>" + line.substr(0, map[com].index) + "</span>" + "<span class='comment'>" + line.substr(map[com].index, map[com].length) + "</span>";
-                else result = "<span class='incorrect'>" + line + "</span>";
-                return result;
-            } else for (var k = i + 1; k < map.length; k++){
-                if (map[k].type !== "incorrect" && map[i].index > map[k].index) {
+        //Index sorting
+        for (var i = 0; i < map.length; i++)
+            for (var k = i + 1; k < map.length; k++)
+                if (map[i].index > map[k].index) {
                     var g = map[i];
                     map[i] = map[k];
                     map[k] = g;
                 }
-            }
-        }
-        for (var i in map){
-            if (map[i].type === "comment")
-                result += "<span class='comment'>" + line.substr(map[i].index, map[i].length) + "</span>";
-            else if (map[i].type === "production")
-                result += "<span class='production'>" + line.substr(map[i].index, map[i].length) + "</span>";
-            else if (map[i].type === "left_rule" || map[i].type === "right_rule")
-                result += "<span class='rule_span'>" + line.substr(map[i].index, map[i].length) + "</span>";
-            else if (map[i].type === "none")
-                result += "<span class='none'>" + (map[i].length===0?"":line.substr(map[i].index, map[i].length)) + "</span>";
-        }
+        //Inserting span tags
+        for (var i in map)
+            result += "<span class='" + tags[map[i].type] + "'>" + (map[i].length===0?"":line.substr(map[i].index, map[i].length)) + "</span>";
         return result;
     };
-
+    //Regular function of setting style options
     var setStyleOptions = function(){
         preItem.className = "text-area-selection";
         target.parentNode.appendChild(preItem);
@@ -103,10 +34,9 @@ function TextareaExtension(target , processor){
         target.style.background = "transparent";
         target.style["-webkit-text-fill-color"] = "#000";
     };
-    
     var changed = false;
-    var timer = setTimeout(analyse, 900);
-    
+    var timer = setTimeout(analyse, 700);
+    //Analyser
     function analyse(){
         if(changed){
             target.style["-webkit-text-fill-color"] = "transparent";
@@ -117,9 +47,9 @@ function TextareaExtension(target , processor){
             var rules_map = processor(rules);
             if (text === "") preItem.style.color = "transparent";
             else for (var i in rules_map) {
-                var textIndex = findText(text, rules[i]);
-                result += text.substr(0, textIndex) + tag_convert(rules_map[i], rules[i]);
-                text = text.substr(textIndex + rules[i].length, text.length);
+                var lineIndex = findLine(text, rules[i]);
+                result += text.substr(0, lineIndex) + tag_convert(rules_map[i], rules[i]);
+                text = text.substr(lineIndex + rules[i].length, text.length);
             }
             result += text;
             if (rules[rules.length - 1] === "") result += "<br>";
@@ -129,33 +59,31 @@ function TextareaExtension(target , processor){
             preItem.scrollTop = target.scrollTop;
         }
     };
-    
+    //Anylser dark trigger
     this.dark = function (){
         if(changed) {
             clearTimeout(timer);
-            timer = setTimeout(analyse, 300);
+            timer = setTimeout(analyse, 700);
         }
         else {
             changed = true;
-            timer = setTimeout(analyse, 300);
+            timer = setTimeout(analyse, 700);
         }
         target.style["-webkit-text-fill-color"] = "#000";
         target.style.background = "#fff";
     };
-
+    //Scroll sync
     this.scrollSync = function () {
         preItem.scrollTop = target.scrollTop;
     };
-
+    //Inner resizing function
     this.resize = function () {
         preItem.style.top = target.offsetTop  + "px";
         preItem.style.left = target.offsetLeft + "px";
     };
-    
+    //Process (main)
     var preItem = document.createElement("pre");
-   
     setStyleOptions();
-
     if (target.addEventListener) {
         target.addEventListener("change", this.dark, false);
         target.addEventListener("keyup", this.dark, false);
@@ -170,4 +98,3 @@ function TextareaExtension(target , processor){
         target.attachEvent("mousemove", this.resize);
     }
 }
-

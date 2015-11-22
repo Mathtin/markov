@@ -119,26 +119,40 @@ textarea:hover {
 #state{
     height: 60px;
     margin-left: 1%;
+    font-size: 10pt;
 }
 
 #history{
     height: 300px;
-    width: 94%;
+    width: 97%;
     text-align: center;
     overflow: auto;
     margin-left: 1%;
+    background: rgb(235, 235, 228);
+    overflow: auto;
 }
-
 #history span{
-    width: 33%;
     float: left;
+    text-align: center;
 }
 .history_note{
-    width: 94%;
+    width: 100%;
     font-size: 10pt;
     /*text-align: center;*/
     float: left;
-    
+}
+.history_note:hover{
+    background-color: yellow;
+    cursor: pointer;
+}
+.hist_id{
+    width: 7%;
+}
+.hist_rule{
+    width: 23%;
+}
+.hist_result{
+    width: 70%;
 }
 
 .text-area-selection {
