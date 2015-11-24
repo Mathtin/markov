@@ -1,29 +1,23 @@
 define( ['jquery', 'utils'],
     function($, utils){
         console.log("LOADING HISTORY HANDLER");
-        var result, state, history, classes, rules, source;
+        var result, state, history, classes, rules;
         
         var enabled = true;
-        var clicked = false;
+        
+        var setOnRuleSelectHandler = function(func){
+            $('body').on('click','.' + classes.hist_rule, func);
+        };
+        var setOnResultSelectHandler = function(func){
+            $('body').on('click','.' + classes.hist_result, func);
+        };
         
         var bind = function(elements, cl, area){
             classes = cl;
             result = elements.result;
             state = elements.state;
             history = elements.history;
-            source = elements.rules;
             rules = area;
-            $('body').on('click','.' + classes.hist_result, function () {
-                if (enabled){
-                    $(result).val($(this).data("strresult"));
-                    $(state).val($(state).val() + "Выбран результат " + $(this).data("strresult") + '\n');
-                    clicked = true;
-                }
-            });
-            $('body').on('click','.' + classes.hist_rule, function () {
-                var pos = utils.indexOfRule($(this).data("ruleline"), $(source).val());
-                rules.hilightLine(pos);
-            });
         };
         
         var clean = function() { 
@@ -42,8 +36,9 @@ define( ['jquery', 'utils'],
         };       
         
         return {
+            setOnRuleSelectHandler: setOnRuleSelectHandler,
+            setOnResultSelectHandler: setOnResultSelectHandler,
             enabled: enabled,
-            clicked: clicked,
             bind: bind,
             clean: clean,
             add: add
