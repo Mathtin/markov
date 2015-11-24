@@ -45,4 +45,3 @@ define( ['jquery', 'utils'],
         };
     }
 );
-

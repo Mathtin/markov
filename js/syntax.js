@@ -88,5 +88,3 @@ define( function(){
         };
     }
 );
-
-
