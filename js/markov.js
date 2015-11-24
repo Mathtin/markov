@@ -101,7 +101,6 @@ define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache'],
         
         var bind = function (elements, cl, err_func){
             ErrorTrap = err_func;
-            historyUI.bind(elements, cl);
             set = elements.set;
             result = elements.result;
             start = elements.start;
@@ -112,7 +111,8 @@ define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache'],
             rules = elements.rules;
             state = elements.state;
             area = new TextareaExtension(document.getElementById(rules.replace("#", "")), function(rules){return rules.map(syntax.mapping);}, cl);
-            window.onresize = function(event) { area.scrollSync(); area.resize(); };              
+            window.onresize = function(event) { area.scrollSync(); area.resize(); }; 
+            historyUI.bind(elements, cl, area);             
             classes = cl;
             $(start).click(start_function);
             $(step).click(step_function);
