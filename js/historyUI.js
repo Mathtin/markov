@@ -1,23 +1,20 @@
-define( ['jquery', 'utils'],
-    function($, utils){
+define( ['jquery'],
+    function($){
         console.log("LOADING HISTORY HANDLER");
-        var result, state, history, classes, rules;
         
-        var enabled = true;
+        var history, classes, enabled = true;
         
         var setOnRuleSelectHandler = function(func){
             $('body').on('click','.' + classes.hist_rule, func);
         };
+        
         var setOnResultSelectHandler = function(func){
             $('body').on('click','.' + classes.hist_result, func);
         };
         
-        var bind = function(elements, cl, area){
+        var bind = function(hist_el, cl){
             classes = cl;
-            result = elements.result;
-            state = elements.state;
-            history = elements.history;
-            rules = area;
+            history = hist_el;
         };
         
         var clean = function() { 

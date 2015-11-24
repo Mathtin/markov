@@ -110,7 +110,7 @@ define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache', 'utils']
             rules = elements.rules; state = elements.state;
             area = new TextareaExtension(document.getElementById(rules.replace("#", "")), function(rules){return rules.map(syntax.mapping);}, cl);
             window.onresize = function(event) { area.scrollSync(); area.resize(); }; 
-            historyUI.bind(elements, cl, area);
+            historyUI.bind(elements.history, cl);
             historyUI.setOnResultSelectHandler(function () {
                 if (historyUI.enabled){
                     $(result).val($(this).data("strresult"));
