@@ -54,6 +54,7 @@ textarea:hover {
     margin: 0 auto 5px;
     text-align: center; 
     background-color:#f5f5f5;
+    cursor: default;
 }
 #content textarea{
     margin-bottom: 10px;
@@ -143,7 +144,8 @@ textarea:hover {
 }
 
 /* MEGA CRUTCH */
-.history_notef{ width: 100%;
+.history_notef{ 
+    width: 100%;
     font-size: 10pt;
     /*text-align: center;*/
     float: left; }
