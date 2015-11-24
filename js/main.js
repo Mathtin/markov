@@ -31,8 +31,8 @@ define(['jquery', 'markov'], function($, markov) {
     var ErrorTrap = function (err){
         var error_msg = "", error_console = "";
         for(var i=0; i<err.length; i++){
-            error_console += "Error: " + err[i].code + " in line " + err[i].line + "\n";
-            error_msg += "Ошибка: " + err[i].desc + " в строке  " + err[i].line + "\n";
+            error_console += "Error: " + err[i].code + (err[i].line!==0?" in line " + err[i].line:"") + "\n";
+            error_msg += "Ошибка: " + err[i].desc + (err[i].line!==0?" в строке  " + err[i].line:"") + "\n";
         }
         console.log(error_console);
         $('#state').val($('#state').val() + error_msg + '\n');
