@@ -1,4 +1,4 @@
-define( ['jquery', 'utils'], function($, utils){
+define( ['utils'], function(utils){
     console.log("LOADING TEXT EXTENSIONS MODULE");
     var TextareaExtension = function (target , processor, classes){
             //Regular tag convertion (inserting span tags in text)
