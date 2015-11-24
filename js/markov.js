@@ -1,7 +1,8 @@
-define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache'],
-    function( TextareaExtension, $, syntax, historyUI, cache){
+define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache', 'utils'],
+    function( TextareaExtension, $, syntax, historyUI, cache, utils){
         console.log("LOADING MRK ENGINE");
-        var step_by_step, clicked = false, iteration = 0;
+        var step_by_step, iteration = 0, clicked = false;
+        
         var switchButtons = function(on){
             $(start).prop("disabled", !on);
             $(step).prop("disabled", !on);
@@ -101,18 +102,26 @@ define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache'],
         
         var bind = function (elements, cl, err_func){
             ErrorTrap = err_func;
-            set = elements.set;
-            result = elements.result;
-            start = elements.start;
-            stop = elements.stop;
-            reset = elements.reset;
-            speed = elements.speed;
-            step = elements.step;
-            rules = elements.rules;
-            state = elements.state;
+            //INPUTS
+            set = elements.set; result = elements.result;
+            //BUTTONS
+            start = elements.start; stop = elements.stop; reset = elements.reset; speed = elements.speed; step = elements.step;
+            //TEXT AREAS
+            rules = elements.rules; state = elements.state;
             area = new TextareaExtension(document.getElementById(rules.replace("#", "")), function(rules){return rules.map(syntax.mapping);}, cl);
             window.onresize = function(event) { area.scrollSync(); area.resize(); }; 
-            historyUI.bind(elements, cl, area);             
+            historyUI.bind(elements, cl, area);
+            historyUI.setOnResultSelectHandler(function () {
+                if (historyUI.enabled){
+                    $(result).val($(this).data("strresult"));
+                    $(state).val($(state).val() + "Выбран результат " + $(this).data("strresult") + '\n');
+                    clicked = true;
+                }
+            });
+            historyUI.setOnRuleSelectHandler(function () {
+                var pos = utils.indexOfRule($(this).data("ruleline"), $(rules).val());
+                area.hilightLine(pos);
+            });
             classes = cl;
             $(start).click(start_function);
             $(step).click(step_function);
