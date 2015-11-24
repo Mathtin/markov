@@ -5,15 +5,12 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="css/style.css" rel="stylesheet" type="text/css"/>
-        
-        <script src="js/jquery-1.11.3.min.js" type="text/javascript"></script>
-        <script src="js/jquery.ba-throttle-debounce.min.js" type="text/javascript"></script>
-        <script src="js/text-exstensions.js" type="text/javascript"></script>
-        <script src="js/main.js" type="text/javascript"></script>
+        <link href='https://fonts.googleapis.com/css?family=Comfortaa&subset=latin,cyrillic' rel='stylesheet' type='text/css'/>
+        <script data-main=js/app src=js/require.js></script>
     </head>
     <body>
-        <h1 id="header">Corrupted Markov</h1>
         <div id="content">
+            <h1 id="header">Corrupted Markov</h1>
             <div id="top_content">
                 <div class="left">
                     <p>Установить:</p>
@@ -25,6 +22,7 @@
                 </div>
             </div>
             <div id="rulse_up">
+                <button id="test" class="middle_buttons" style="float: left; margin-left: 8px;" data-reveal-id="tests" tabindex="10">Тесты</button>
                 <button id="step" class="middle_buttons" tabindex="9">Шаг</button>
                 <button id="stop" class="middle_buttons" tabindex="8">Стоп</button>
                 <select id="speed" class="middle_buttons" tabindex="7">
@@ -51,13 +49,12 @@
                     <div id="history_block">
                         <p>История:</p>
                         <div id="history">
-                            <div class="history_note" id="top_history">
+                            <div class="history_notef" id="top_history">
                                 <span class="hist_idf">N</span>
                                 <span class="hist_rulef">Правило</span>
                                 <span class="hist_resultf">Результат</span>
                             </div>
                         </div>
-                        <!--<textarea disabled id="history" tabindex="4"></textarea>-->
                     </div>
                 </div>
             </div>
