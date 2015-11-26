@@ -56,11 +56,11 @@ define( ['utils'], function(utils){
             this.dark = function (){
                 if(changed) {
                     clearTimeout(timer);
-                    timer = setTimeout(analyse, this.time_delay);
+                    timer = setTimeout(analyse, 700);
                 }
                 else {
                     changed = true;
-                    timer = setTimeout(analyse, this.time_delay);
+                    timer = setTimeout(analyse, 700);
                 }
                 target.style["-webkit-text-fill-color"] = "#000";
                 target.style.background = "#fff";

@@ -1,5 +1,5 @@
-define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache', 'utils'],
-    function( TextareaExtension, $, syntax, historyUI, cache, utils){
+define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache', 'utils', 'modals'],
+    function( TextareaExtension, $, syntax, historyUI, cache, utils, modals){
         console.log("LOADING MRK ENGINE");
         var step_by_step, iteration = 0, clicked = false;
         
@@ -9,22 +9,27 @@ define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache', 'utils']
             $(speed).prop("disabled", !on);
         };
         
-        var makeStep = function (rules, text, iteration){
+        var makeStep = function (rules, text, source){
+            if ($(source).val() === "") return {
+                        success: false,
+                        errors: [{
+                            code: "EmptySet",
+                            desc: "Пустая установка",
+                            line: 0
+                        }]};
             for(var i=0; i<rules.length; i++)
                 if (rules[i].left === "" || text.indexOf(rules[i].left)>=0){
                     if (rules[i].left === "") text = rules[i].right + text;
                     else text = text.replace(rules[i].left, rules[i].right);
                     text = text.replace(/ /g,"");
-                    $(result).val(text);
-                    historyUI.add(rules[i], text, iteration);
-                    if ($(result).val().length>bufferLength) return {
+                    if (text.length>bufferLength) return {
                         success: false,
                         errors: [{
                             code: "BufferOverflow",
                             desc: "Переполнение буфера",
                             line: 0
                         }]
-                    }; else if (!(rules[i].end) && $(result).val() === $(set).val())return {
+                    }; else if (!(rules[i].end) && text === $(source).val())return {
                         success: false,
                         errors: [{
                             code: "Loop",
@@ -32,7 +37,7 @@ define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache', 'utils']
                             line: 0
                         }]
                     };
-                    return { success: true, end: rules[i].end };
+                    return { success: true, rules: rules[i], result: text };
                 }
             return {
                 success: false,
@@ -57,15 +62,23 @@ define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache', 'utils']
                 var pipe = {
                     func: function(){
                             this.iteration++;
-                            var end_check = makeStep(this.rules, $(result).val(), this.iteration);
-                            end = end_check.end;
-                            if (!end_check.success || end_check.end){
-                                if (!end_check.success) ErrorTrap(end_check.errors);
-                                else $(state).val($(state).val() + "Успешное завершение алгоритма!\n");
+                            var res = makeStep(this.rules, $(result).val(), result, set);
+                            if (!res.success || res.rules.end){
+                                if (!res.success) ErrorTrap(res.errors);
+                                else {
+                                    $(result).val(res.result);
+                                    $(state).val($(state).val() + "Успешное завершение алгоритма!\n");
+                                    historyUI.add(res.rules, res.result, this.iteration);
+                                }
                                 switchButtons(true);
                                 historyUI.enabled = true;
                                 clearInterval(step_by_step);
+                                return 0;
+                            } else {
+                                this.end = res.rules.end;
+                                $(result).val(res.result);
                             }
+                            historyUI.add(res.rules, res.result, this.iteration);
                         },
                     rules: rules_stack.result,
                     end: false,
@@ -86,8 +99,10 @@ define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache', 'utils']
                 var rules_stack = syntax.parse($(rules).val());
                 if (!rules_stack.success) throw rules_stack.errors;
                 iteration++;
-                rules_stack = makeStep(rules_stack.result, $(result).val(),iteration);
+                rules_stack = makeStep(rules_stack.result, $(result).val(), set);
                 if (!rules_stack.success) throw rules_stack.errors;
+                historyUI.add(rules_stack.rules, rules_stack.result, iteration);
+                $(result).val(rules_stack.result);
             } catch (err){
                 ErrorTrap(err);
                 return 0;
@@ -109,7 +124,24 @@ define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache', 'utils']
             //TEXT AREAS
             rules = elements.rules; state = elements.state;
             area = new TextareaExtension(document.getElementById(rules.replace("#", "")), function(rules){return rules.map(syntax.mapping);}, cl);
-            window.onresize = function(event) { area.scrollSync(); area.resize(); }; 
+            window.onresize = function(event) { area.scrollSync(); area.resize(); };
+            modals.bind(elements, cl, function(target, source){
+                var rules_stack = syntax.parse($(rules).val());
+                if (!rules_stack.success) return rules_stack;
+                var end = false;
+                while (!end){
+                    var result = makeStep(rules_stack.result, $(target).val(), source);
+                    if (!result.success) {
+                        var error_msg = "";
+                        for(var i=0; i<result.errors.length; i++)
+                            error_msg += "Ошибка: " + result.errors[i].desc + (result.errors[i].line!==0?" в строке  " + result.errors[i].line:"") + "\n";
+                        $(target).val(error_msg);
+                        break;
+                    }
+                    else $(target).val(result.result);
+                    end = result.rules.end;
+                }
+            });
             historyUI.bind(elements.history, cl);
             historyUI.setOnResultSelectHandler(function () {
                 if (historyUI.enabled){
@@ -145,7 +177,6 @@ define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache', 'utils']
             });
             cache.apply_cache(elements);
             $(rules).keyup(cache.update_cache(set, rules));
-            area.time_delay = 700;
             area.dark();
             setTimeout(area.resize(), area.time_delay + 100);
         };

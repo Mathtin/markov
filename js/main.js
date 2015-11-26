@@ -14,8 +14,11 @@ define(['jquery', 'markov'], function($, markov) {
         history_notef: "history_notef",
         hist_idf: "hist_idf",
         hist_rulef: "hist_rulef",
-        hist_resultf: "hist_resultf"
-    }; 
+        hist_resultf: "hist_resultf",
+        dell_element: "dell_element",
+        some_test: "some_test"
+    };
+    
     var elements = {
         set: '#set',
         result: '#result',
@@ -26,8 +29,13 @@ define(['jquery', 'markov'], function($, markov) {
         speed: '#speed',
         stop: '#stop',
         step: '#step',
-        history: '#history'
+        history: '#history',
+        test: '#test',
+        mod_tests: 'tests',
+        add_test: '#add_test',
+        tests_start: '#tests_start'
     };
+    
     var ErrorTrap = function (err){
         var error_msg = "", error_console = "";
         for(var i=0; i<err.length; i++){
@@ -37,5 +45,10 @@ define(['jquery', 'markov'], function($, markov) {
         console.log(error_console);
         $('#state').val($('#state').val() + error_msg + '\n');
     };
+    
     markov.bind(elements, classes, ErrorTrap);
+    
+    $(window).scroll(function (){
+        alert("down");
+    });
 });
