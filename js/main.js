@@ -20,6 +20,7 @@ define(['jquery', 'markov'], function($, markov) {
     };
     
     var elements = {
+        main: '#content',
         set: '#set',
         result: '#result',
         rules: '#rules',

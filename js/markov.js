@@ -1,7 +1,7 @@
 define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache', 'utils', 'modals'],
     function( TextareaExtension, $, syntax, historyUI, cache, utils, modals){
         console.log("LOADING MRK ENGINE");
-        var step_by_step, iteration = 0, clicked = false;
+        var step_by_step, iteration = 0, clicked = false, main;
         
         var switchButtons = function(on){
             $(start).prop("disabled", !on);
@@ -116,13 +116,18 @@ define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache', 'utils',
         var ErrorTrap;
         
         var bind = function (elements, cl, err_func){
-            ErrorTrap = err_func;
+            ErrorTrap = err_func; main = elements.main;
             //INPUTS
             set = elements.set; result = elements.result;
             //BUTTONS
             start = elements.start; stop = elements.stop; reset = elements.reset; speed = elements.speed; step = elements.step;
             //TEXT AREAS
             rules = elements.rules; state = elements.state;
+            $(main).append("<div id=\"foot\"><span>by <a href=\"https://vk.com/mathtin\" target=\"blank\">Mathtin</a> & <a href=\"https://vk.com/plaguedo\" target=\"blank\">Plaguedo</a> as a part of Corrupted Project</span></div>");
+            var foot = document.getElementById("foot");
+            foot.style["text-align"] = "right";
+            foot.style.padding = "0px 5px 5px 0px";
+            foot.style["font-size"] = "8pt";
             area = new TextareaExtension(document.getElementById(rules.replace("#", "")), function(rules){return rules.map(syntax.mapping);}, cl);
             window.onresize = function(event) { area.scrollSync(); area.resize(); };
             modals.bind(elements, cl, function(target, source){
