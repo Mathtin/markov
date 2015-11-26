@@ -5,6 +5,8 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="css/style.css" rel="stylesheet" type="text/css"/>
+        <link href="css/remodal.css" rel="stylesheet" type="text/css"/>
+        <link href="css/modals-style.css" rel="stylesheet" type="text/css"/>
         <link href='https://fonts.googleapis.com/css?family=Comfortaa&subset=latin,cyrillic' rel='stylesheet' type='text/css'/>
         <script data-main=js/app src=js/require.js></script>
     </head>
@@ -22,6 +24,7 @@
                 </div>
             </div>
             <div id="rulse_up">
+                <button id="test" class="middle_buttons" style="float: left; margin-left: 8px;" data-reveal-id="tests" tabindex="10">Тесты</button>
                 <button id="step" class="middle_buttons" tabindex="9">Шаг</button>
                 <button id="stop" class="middle_buttons" tabindex="8">Стоп</button>
                 <select id="speed" class="middle_buttons" tabindex="7">
@@ -57,6 +60,23 @@
                     </div>
                 </div>
             </div>
+        </div>
+    <!-- MODALS -->
+        <div id="test_modal" class="remodal" data-remodal-id="tests">
+            <button data-remodal-action="close" class="remodal-close"></button>
+            <h1>Проверка на тестах!</h1>
+            <br>
+            <div id="all_tests">
+                <div class="some_test">
+                    <textarea class='test_textarea' data-testid='1'></textarea>
+                    <textarea class='test_textarea' data-resultid='1' disabled></textarea>
+                    <div class="dell_element"></div>
+                </div>
+            </div>
+            <div id="add_test"></div>
+            <br>
+            <button data-remodal-action="cancel" class="remodal-cancel">Cancel</button>
+            <button id='tests_start' class="remodal-confirm">GO</button>
         </div>
     </body>
 </html>
