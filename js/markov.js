@@ -62,7 +62,7 @@ define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache', 'utils',
                 var pipe = {
                     func: function(){
                             this.iteration++;
-                            var res = makeStep(this.rules, $(result).val(), result, set);
+                            var res = makeStep(this.rules, $(result).val(), set);
                             if (!res.success || res.rules.end){
                                 if (!res.success) ErrorTrap(res.errors);
                                 else {
