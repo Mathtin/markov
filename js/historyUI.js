@@ -25,11 +25,12 @@ define( ['jquery'],
                             "<span class=\"" + classes.hist_resultf+ "\">Результат</span></div>");
         };
         
-        var add = function(rule, text, iteration){
+        var add = function(rule, text, iteration, speed){
             $(history).append("<div class=\"" + classes.history_note + "\">"+ 
                             "<span class=\"" + classes.hist_id + "\"> " + iteration + ". </span>" +
                             "<span class=\"" + classes.hist_rule + "\" data-ruleline = \"" + rule.line + "\">" + rule.left + (rule.end ? " ->. " : " -> ") + rule.right + "</span>" +
                             "<span class=\"" + classes.hist_result+ "\" data-strresult = \"" + text + "\">" + text + "</span></div>");
+            $(history).scrollTop($(history).prop("scrollHeight"));
         };       
         
         return {

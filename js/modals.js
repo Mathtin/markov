@@ -33,6 +33,7 @@ define( ['jquery', 'remodal'],
                             <textarea class='test_textarea' data-resultid='" + test_count + "' disabled></textarea>\n\
                             <div class='" + classes.dell_element + "' data-dell-id=\"" + test_count +"\"></div>\n\
                         </div>\n");
+                $('[data-remodal-id=' + mod_tests + ']').scrollTop($('[data-remodal-id=' + mod_tests + ']').prop("scrollHeight"));
             });
             $('body').on('click','.' + classes.dell_element, function(){
                 $(this).parent("."+classes.some_test).remove();
