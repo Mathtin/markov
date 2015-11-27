@@ -249,3 +249,45 @@ body { font-family: Comfortaa; }
     padding: 1px 3px 1px 3px;
 }
 
+#gear {
+    width: 28px;
+    height: 28px;
+    background: url(../img/gear.png) no-repeat;
+    background-position: 1px 1px;
+    background-size: 26px 26px;
+    float: left;
+    margin-left: 8px;
+}
+
+@keyframes rotate {
+  0%   { transform: rotate(  0deg); }
+  100% { transform: rotate(180deg); }
+}
+
+@keyframes revRotate {
+  0%   { transform: rotate(  0deg); }
+  100% { transform: rotate(-180deg); }
+}
+
+#left_rules_up {
+    width: 110px;
+    float: left;
+}
+
+#right_rules_up {
+    width: 690px;
+    float: right;
+}
+
+#help {
+    position: absolute;
+    width: 300px;
+    height: 28px;
+    padding-top: 2px;
+    z-index: 2;
+    background-color: rgba(210,210,210, 0.2);
+}
+
+#help span{
+    font-size: 11pt;
+}

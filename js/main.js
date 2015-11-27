@@ -32,6 +32,8 @@ define(['jquery', 'markov'], function($, markov) {
         step: '#step',
         history: '#history',
         test: '#test',
+        settings: '#gear',
+        set_menu: '#help',
         mod_tests: 'tests',
         add_test: '#add_test',
         tests_start: '#tests_start'
@@ -48,5 +50,4 @@ define(['jquery', 'markov'], function($, markov) {
     };
     
     markov.bind(elements, classes, ErrorTrap);
-    
 });

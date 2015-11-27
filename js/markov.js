@@ -111,7 +111,7 @@ define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache', 'utils',
             return 0;
         };
         
-        var set, result, start, start, stop, reset, speed, step, rules, state, classes, area;
+        var set, result, start, start, stop, reset, speed, step, rules, state, classes, area, settings, set_menu, set_trigger = true;
         
         var ErrorTrap;
         
@@ -121,6 +121,7 @@ define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache', 'utils',
             set = elements.set; result = elements.result;
             //BUTTONS
             start = elements.start; stop = elements.stop; reset = elements.reset; speed = elements.speed; step = elements.step;
+            settings = elements.settings; set_menu = elements.set_menu;
             //TEXT AREAS
             rules = elements.rules; state = elements.state;
             $(main).append("<div id=\"foot\"><span>by <a href=\"https://vk.com/mathtin\" target=\"blank\">Mathtin</a> & <a href=\"https://vk.com/plaguedo\" target=\"blank\">Plaguedo</a> as a part of Corrupted Project</span></div>");
@@ -160,6 +161,20 @@ define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache', 'utils',
                 area.hilightLine(pos);
             });
             classes = cl;
+            $(set_menu).hide();
+            $(settings).click(function(){
+                if (set_trigger) {
+                    this.style.animation = "rotate 700ms linear";
+                    this.style["-webkit-animation"] = "rotate 700ms linear";
+                    set_trigger = false;
+                    $(set_menu).slideDown(700);
+                } else {
+                    this.style.animation = "revRotate 700ms linear";
+                    this.style["-webkit-animation"] = "revRotate 700ms linear";
+                    set_trigger = true;
+                    $(set_menu).slideUp(700);
+                }
+            });
             $(start).click(start_function);
             $(step).click(step_function);
             $(stop).click(function(){
