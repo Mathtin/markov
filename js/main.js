@@ -49,7 +49,4 @@ define(['jquery', 'markov'], function($, markov) {
     
     markov.bind(elements, classes, ErrorTrap);
     
-    $(window).scroll(function (){
-        alert("down");
-    });
 });
