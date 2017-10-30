@@ -40,8 +40,7 @@ body { font-family: Comfortaa; }
     position: relative;
     resize: none;
     border: 2px solid rgba(200,200,200,1);
-    font-size: 14px;
-    font-family: Arial;
+    font: 14px 'Roboto Mono', monospace;
     box-shadow: 1px 1px 3px 1px rgba(210,210,210, 0.2) inset;
     padding-top:1px;
     padding-left: 5px;
@@ -203,9 +202,14 @@ body { font-family: Comfortaa; }
     overflow:auto;
     width: 380px;
     height: 400px;
-    font: 14px Arial;
+    font: 14px 'Roboto Mono', monospace;
     margin: 3px 0px 0px 3px;
     background-color: #fff;
+}
+
+.lambda {
+    color: rgb(216,216,216);
+    background-color: rgb(249,249,249);
 }
 
 .incorrect { border-bottom:1px dotted red; color: red; }
@@ -296,4 +300,4 @@ body { font-family: Comfortaa; }
 #help input {
     width:auto;
     margin: 6px;
-}
+} 

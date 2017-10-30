@@ -2,7 +2,7 @@ define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache', 'utils',
     function( TextareaExtension, $, syntax, historyUI, cache, utils, modals) {
         console.log("LOADING MRK ENGINE");
         
-        var step_by_step, iteration = 0, clicked = false, main;
+        var step_by_step, iteration = 0, clicked = false, main, eventChanged, textAreaTarget;
         
         var set, result, start, start, stop, reset, speed, step, rules, state, classes, area, settings, set_menu, set_trigger = true, spaceSensitivity = false;
         
@@ -135,7 +135,8 @@ define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache', 'utils',
             foot.style.padding = "0px 5px 5px 0px";
             foot.style["font-size"] = "8pt";
             spaceSensitivity = elements.space_sensitivity;
-            area = new TextareaExtension(document.getElementById(rules.replace("#", "")), function(rules){return rules.map(syntax.mapping);}, cl);
+            textAreaTarget = document.getElementById(rules.replace("#", ""));
+            area = new TextareaExtension(textAreaTarget, function(rules){return rules.map(syntax.mapping);}, cl, function(){return $(spaceSensitivity).prop("checked");});
             window.onresize = function(event) { area.scrollSync(); area.resize(); };
             modals.bind(elements, cl, function(target, source){
                 var rules_stack = syntax.parse($(rules).val(), $(spaceSensitivity).prop("checked"));
@@ -167,8 +168,21 @@ define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache', 'utils',
                 area.hilightLine(pos);
             });
             classes = cl;
+            if (document.createEvent) {
+                eventChanged = document.createEvent("HTMLEvents");
+                eventChanged.initEvent("change", true, true);
+            } else {
+                eventChanged = document.createEventObject();
+                eventChanged.eventType = "change";
+            }
+            eventChanged.eventName = "change";
             $(elements.space_sensitivity).click(function(){
                 cache.update_cache(set, rules, $(this).prop("checked"));
+                if (document.createEvent) {
+                    textAreaTarget.dispatchEvent(eventChanged);
+                } else {
+                    textAreaTarget.fireEvent("on" + eventChanged.eventType, eventChanged);
+                }
             });
             $(set_menu).hide();
             $(settings).click(function(){

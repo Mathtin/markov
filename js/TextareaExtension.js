@@ -1,6 +1,6 @@
 define( ['utils'], function(utils){
     console.log("LOADING TEXT EXTENSIONS MODULE");
-    var TextareaExtension = function (target , processor, classes){
+    var TextareaExtension = function (target, processor, classes, spaceSensivityGetter){
             //Regular tag convertion (inserting span tags in text)
             var insertTags = function(map, line) {
                 var result = "";
@@ -13,8 +13,15 @@ define( ['utils'], function(utils){
                             map[k] = g;
                         }
                 //Inserting span tags
-                for (var i in map)
-                    result += "<span class='" + classes[map[i].type] + "'>" + (map[i].length===0?"":line.substr(map[i].index, map[i].length)) + "</span>";
+                var part, pclass;
+                for (var i in map) {
+                    pclass = classes[map[i].type];
+                    part = map[i].length===0?"":line.substr(map[i].index, map[i].length);
+                    if (spaceSensivityGetter() && pclass == "rule_span") {
+                        part = part.replace(/ /g, '<span class="lambda">&lambda;</span>');
+                    }
+                    result +=  "<span class='" + pclass + "'>" + part + "</span>";
+                }
                 return result;
             };
             //Regular function of setting style options
