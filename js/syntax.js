@@ -13,27 +13,27 @@ define( function(){
                 return map_arr;
             } else if (temp === "") return map_arr;
             str = temp;
-            if (temp.indexOf(" ->. ")>=0){
+            if (temp.indexOf(" ->. ") >=0 ) {
                 map_arr.push({type: "e_production", index: str.indexOf(" ->. "), length: 5});
                 temp = temp.split(" ->. ", 2);
-            }else if (temp.indexOf(" -> ")>=0){
+            } else if (temp.indexOf(" -> ") >= 0) {
                 map_arr.push({type: "production", index: str.indexOf(" -> "), length: 4});
                 temp = temp.split(" -> ", 2);
-            }else if (temp.indexOf("->.")>=0){
+            } else if (temp.indexOf("->.") >= 0){
                 if (temp.replace("->.", "").indexOf("->")>=0){
                     map_arr.push({type: "incorrect", sub_type: "AmbiguousProduction", index: 0, length: temp.length});
                     return map_arr;
                 }
                 map_arr.push({type: "e_production", index: str.indexOf("->."), length: 3});
                 temp = temp.split("->.", 2);
-            }else if (temp.indexOf("->")>=0){
+            } else if (temp.indexOf("->")>=0){
                 if (temp.replace("->", "").indexOf("->")>=0){
                     map_arr.push({type: "incorrect", sub_type: "AmbiguousProduction", index: 0, length: temp.length});
                     return map_arr;
                 }
                 map_arr.push({type: "production", index: str.indexOf("->"), length: 2});
                 temp = temp.split("->", 2);
-            }else {
+            } else {
                 map_arr.push({type: "incorrect", sub_type: "ArrowExpected", index: 0, length: temp.length});
                 return map_arr;
             }
@@ -49,7 +49,7 @@ define( function(){
             return map_arr;
         };
 
-        var parse = function(rules){
+        var parse = function(rules, spaceSensetive){
             rules = rules.split("\n");
             var end_trigger = false, success = true;
             rules = rules.map(function(str, i){
@@ -67,6 +67,11 @@ define( function(){
                     else if (map[k].type === "rightRule") right = str.substr(map[k].index, map[k].length);
                     else if (map[k].type === "e_production") end = true;
                     if (end && !end_trigger) end_trigger = true;
+                }
+                // console.log("'" + left + "'" + " -> " + right + " " + (i+1));
+                if (!spaceSensetive) {
+                    left = left.replace(/ /g,"");
+                    right = right.replace(/ /g,"");
                 }
                 if (left !== right) {
                     //console.log(left + " -> " + right + " " + (i+1));

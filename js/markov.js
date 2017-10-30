@@ -1,7 +1,12 @@
 define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache', 'utils', 'modals'],
-    function( TextareaExtension, $, syntax, historyUI, cache, utils, modals){
+    function( TextareaExtension, $, syntax, historyUI, cache, utils, modals) {
         console.log("LOADING MRK ENGINE");
+        
         var step_by_step, iteration = 0, clicked = false, main;
+        
+        var set, result, start, start, stop, reset, speed, step, rules, state, classes, area, settings, set_menu, set_trigger = true, spaceSensitivity = false;
+        
+        var ErrorTrap;
         
         var switchButtons = function(on){
             $(start).prop("disabled", !on);
@@ -9,7 +14,7 @@ define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache', 'utils',
             $(speed).prop("disabled", !on);
         };
         
-        var makeStep = function (rules, text, source){
+        var makeStep = function (rules, text, source, spaceSensitive) {
             if ($(source).val() === "") return {
                         success: false,
                         errors: [{
@@ -17,26 +22,30 @@ define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache', 'utils',
                             desc: "Пустая установка",
                             line: 0
                         }]};
+            if (!spaceSensitive) text = text.replace(/ /g,"");
+            // console.log(rules);
             for(var i=0; i<rules.length; i++)
                 if (rules[i].left === "" || text.indexOf(rules[i].left)>=0){
                     if (rules[i].left === "") text = rules[i].right + text;
                     else text = text.replace(rules[i].left, rules[i].right);
-                    text = text.replace(/ /g,"");
-                    if (text.length>bufferLength) return {
-                        success: false,
-                        errors: [{
-                            code: "BufferOverflow",
-                            desc: "Переполнение буфера",
-                            line: 0
-                        }]
-                    }; else if (!(rules[i].end) && text === $(source).val())return {
-                        success: false,
-                        errors: [{
-                            code: "Loop",
-                            desc: "Зацикленный алгоритм",
-                            line: 0
-                        }]
-                    };
+                    if (text.length>bufferLength) 
+                        return {
+                            success: false,
+                            errors: [{
+                                code: "BufferOverflow",
+                                desc: "Переполнение буфера",
+                                line: 0
+                            }]
+                        }; 
+                    else if (!(rules[i].end) && text === $(source).val()) 
+                        return {
+                            success: false,
+                            errors: [{
+                                code: "Loop",
+                                desc: "Зацикленный алгоритм",
+                                line: 0
+                            }]
+                        };
                     return { success: true, rules: rules[i], result: text };
                 }
             return {
@@ -57,12 +66,12 @@ define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache', 'utils',
                 clicked = false;
             }
             try {
-                var rules_stack = syntax.parse($(rules).val());
+                var rules_stack = syntax.parse($(rules).val(), $(spaceSensitivity).prop("checked"));
                 if (!rules_stack.success) throw rules_stack.errors;
                 var pipe = {
                     func: function(){
                             this.iteration++;
-                            var res = makeStep(this.rules, $(result).val(), set);
+                            var res = makeStep(this.rules, $(result).val(), set, $(spaceSensitivity).prop("checked"));
                             if (!res.success || res.rules.end){
                                 if (!res.success) ErrorTrap(res.errors);
                                 else {
@@ -96,10 +105,10 @@ define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache', 'utils',
         
         var step_function = function(){
             try {
-                var rules_stack = syntax.parse($(rules).val());
+                var rules_stack = syntax.parse($(rules).val(), $(spaceSensitivity).prop("checked"));
                 if (!rules_stack.success) throw rules_stack.errors;
                 iteration++;
-                rules_stack = makeStep(rules_stack.result, $(result).val(), set);
+                rules_stack = makeStep(rules_stack.result, $(result).val(), set, $(spaceSensitivity).prop("checked"));
                 if (!rules_stack.success) throw rules_stack.errors;
                 historyUI.add(rules_stack.rules, rules_stack.result, iteration, 100);
                 $(result).val(rules_stack.result);
@@ -110,10 +119,6 @@ define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache', 'utils',
             if(rules_stack.end) $(state).val($(state).val() + "Успешное завершение алгоритма!\n");
             return 0;
         };
-        
-        var set, result, start, start, stop, reset, speed, step, rules, state, classes, area, settings, set_menu, set_trigger = true;
-        
-        var ErrorTrap;
         
         var bind = function (elements, cl, err_func){
             ErrorTrap = err_func; main = elements.main;
@@ -129,14 +134,15 @@ define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache', 'utils',
             foot.style["text-align"] = "right";
             foot.style.padding = "0px 5px 5px 0px";
             foot.style["font-size"] = "8pt";
+            spaceSensitivity = elements.space_sensitivity;
             area = new TextareaExtension(document.getElementById(rules.replace("#", "")), function(rules){return rules.map(syntax.mapping);}, cl);
             window.onresize = function(event) { area.scrollSync(); area.resize(); };
             modals.bind(elements, cl, function(target, source){
-                var rules_stack = syntax.parse($(rules).val());
+                var rules_stack = syntax.parse($(rules).val(), $(spaceSensitivity).prop("checked"));
                 if (!rules_stack.success) return rules_stack;
                 var end = false;
                 while (!end){
-                    var result = makeStep(rules_stack.result, $(target).val(), source);
+                    var result = makeStep(rules_stack.result, $(target).val(), source, $(spaceSensitivity).prop("checked"));
                     if (!result.success) {
                         var error_msg = "";
                         for(var i=0; i<result.errors.length; i++)
@@ -161,6 +167,9 @@ define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache', 'utils',
                 area.hilightLine(pos);
             });
             classes = cl;
+            $(elements.space_sensitivity).click(function(){
+                cache.update_cache(set, rules, $(this).prop("checked"));
+            });
             $(set_menu).hide();
             $(settings).click(function(){
                 if (set_trigger) {
@@ -184,7 +193,16 @@ define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache', 'utils',
             });
             $(set).keyup(function(){ 
                 $(result).val($(set).val()); 
-                cache.update_cache(set, rules);
+                cache.update_cache(set, rules, spaceSensitivity);
+            });
+            $(reset).click(function(){
+                $(state).val("");
+                switchButtons(true);
+                historyUI.enabled = true;
+                clearInterval(step_by_step);
+                $(result).val($(set).val());
+                historyUI.clean();
+                iteration = 0;
             });
             $(reset).click(function(){
                 $(state).val("");
@@ -196,7 +214,7 @@ define( ['TextareaExtension', 'jquery', 'syntax', 'historyUI', 'cache', 'utils',
                 iteration = 0;
             });
             cache.apply_cache(elements);
-            $(rules).keyup(cache.update_cache(set, rules));
+            $(rules).keyup(function(){ cache.update_cache(set, rules, spaceSensitivity) });
             area.dark();
             setTimeout(area.resize(), area.time_delay + 100);
         };

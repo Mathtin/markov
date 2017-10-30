@@ -257,11 +257,6 @@ body { font-family: Comfortaa; }
     background-size: 26px 26px;
     float: left;
     margin-left: 8px;
-    border: 0px;
-}
-
-#gear:focus{
-    outline: 0px;
 }
 
 @keyframes rotate {
@@ -286,13 +281,19 @@ body { font-family: Comfortaa; }
 
 #help {
     position: absolute;
-    width: 300px;
+    width: 286px;
     height: 28px;
     padding-top: 2px;
     z-index: 2;
     background-color: rgba(210,210,210, 0.2);
 }
 
-#help span{
-    font-size: 11pt;
+#help span {
+    font-size: 10pt;
+    vertical-align: text-top;
+}
+
+#help input {
+    width:auto;
+    margin: 6px;
 }

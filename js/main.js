@@ -36,7 +36,8 @@ define(['jquery', 'markov'], function($, markov) {
         set_menu: '#help',
         mod_tests: 'tests',
         add_test: '#add_test',
-        tests_start: '#tests_start'
+        tests_start: '#tests_start',
+        space_sensitivity: 'input[value="Space Sensitivity"]'
     };
     
     var ErrorTrap = function (err){
